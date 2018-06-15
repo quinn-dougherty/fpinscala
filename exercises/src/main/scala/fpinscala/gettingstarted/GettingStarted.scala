@@ -39,7 +39,8 @@ object MyModule {
 
   def fib(n: Int): Int = {
     // @annotation.tailrec
-    if (n==0 || n==1) 1
+    if (n==0) 0
+    else if (n==1) 1
     else fib(n-1) + fib(n-2)
   }
 
@@ -148,11 +149,28 @@ object PolymorphicFunctions {
 
   // Exercise 2: Implement a polymorphic function to check whether
   // an `Array[A]` is sorted
-  def isSorted[A](as: Array[A], gt: (A,A) => Boolean): Boolean = ???
+  def isSorted[A](as: Array[A], ordered: (A,A) => Boolean): Boolean = {
+    @annotation.tailrec
+    def go(n: Int): Boolean = {
+      if (n+1 >= as.length) true
+      else if (ordered(as(n),(as(n+1)))) go(n+1)
+      else false
+    }
+    go(0)
+  }
 
+  def lessThan(n: Int, p: Int): Boolean = { // strictly for the test
+    if (n < p) true
+    else false
+  }
+
+  // testing isSorted
+  def main(args: Array[String]): Unit = {
+    println(isSorted(Array(1,2,3,4), lessThan))
+    println(isSorted(Array(4,3,2,5,1), lessThan))
+  }
   // Polymorphic functions are often so constrained by their type
   // that they only have one implementation! Here's an example:
-
   def partial1[A,B,C](a: A, f: (A,B) => C): B => C =
     (b: B) => f(a, b)
 

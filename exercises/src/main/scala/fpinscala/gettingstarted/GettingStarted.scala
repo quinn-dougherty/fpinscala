@@ -159,16 +159,9 @@ object PolymorphicFunctions {
     go(0)
   }
 
-  def lessThan(n: Int, p: Int): Boolean = { // strictly for the test
-    if (n < p) true
-    else false
-  }
 
-  // testing isSorted
-  def main(args: Array[String]): Unit = {
-    println(isSorted(Array(1,2,3,4), lessThan))
-    println(isSorted(Array(4,3,2,5,1), lessThan))
-  }
+
+  
   // Polymorphic functions are often so constrained by their type
   // that they only have one implementation! Here's an example:
   def partial1[A,B,C](a: A, f: (A,B) => C): B => C =
@@ -199,6 +192,27 @@ object PolymorphicFunctions {
 
   // Exercise 5: Implement `compose`
 
-  def compose[A,B,C](f: B => C, g: A => B): A => C =
-    ???
+  def compose[A,B,C](f: B => C, g: A => B): A => C = {
+    g(f)
+  }
+  
+
+  // testing
+  def main(args: Array[String]): Unit = {
+    def lessThan(n: Int, p: Int): Boolean = { // strictly for the test
+      if (n < p) true
+      else false
+    }
+
+    def timesTwo(n: Int): Int = n*2
+    def plusThree(n: Int): Int = n+3
+
+    println("isSorted test: should be true then false")
+    println(isSorted(Array(1,2,3,4), lessThan))
+    println(isSorted(Array(4,3,2,5,1), lessThan))
+    println("compose test")
+    println(compose(timesTwo, plusThree))
+    println(compose(plusThree, timesTwo))
+  }
+
 }

@@ -169,7 +169,8 @@ object PolymorphicFunctions {
   // Note that `=>` associates to the right, so we could
   // write the return type as `A => B => C`
   def curry[A,B,C](f: (A, B) => C): A => (B => C) =
-    f.curried // the cheap answer, obviously
+    // f.curried // the cheap answer, obviously
+    (a: A) => (b: B) => f(a,b)
       // lets also try these
   /* val curriedPrime = new function2[A,B,C] {
       def 
@@ -179,11 +180,12 @@ object PolymorphicFunctions {
   // NB: The `Function2` trait has a `curried` method already 
 */
   // Exercise 4: Implement `uncurry`
-  def uncurry[A,B,C](f: A => B => C): (A, B) => C =
-    val f2 = new Function1[A,B=>C] {
-      f2 = f.uncurried
-    } 
+  def uncurry[A,B,C](f: A => B => C): (A, B) => C = 
+//    val f2 = new Function[A,B=>C] {
+//      f2 = f.uncurried
+//    }
     //f2.uncurried
+    (a: A, b: B) => f(a)(b)
 
   /*
   NB: There is a method on the `Function` object in the standard library,
@@ -196,12 +198,10 @@ object PolymorphicFunctions {
   */
 
   // Exercise 5: Implement `compose`
-
   def compose[A,B,C](f: B => C, g: A => B): A => C = 
-    ??? //g(f)
+    (x: A) => f(g(x))
   
   
-
   // testing for the polymorphic functions thing
   def main(args: Array[String]): Unit = {
     def lessThan(n: Int, p: Int): Boolean = { // strictly for the test
@@ -212,16 +212,26 @@ object PolymorphicFunctions {
     val lessThan2 = new Function2[Int, Int, Boolean] {
       def apply(a: Int, b: Int) = a < b
     }
-
     def timesTwo(n: Int): Int = n*2
     def plusThree(n: Int): Int = n+3
 
+    //for curry
+    val f1 = (x: Int, y: Int) => x+y
+    // for uncurry
+    val g1 = (x: Int) => (y: Int) => x-y
+
     println("isSorted test: should be true then false")
     println(isSorted(Array(1,2,3,4), lessThan2))
-    println(isSorted(Array(4,3,2,5,1), lessThan2)) // lt1 and lt2 are equivalent. 
-    println("compose test")
-    println(compose(timesTwo, plusThree))
-    println(compose(plusThree, timesTwo))
+    println(isSorted(Array(4,3,2,5,1), lessThan2)) // lt1 and lt2 are equivalent.
+    println("\ncurry test: should say true")
+    println(curry(f1)(5)(6) == f1(6,5))
+    
+    println("\nuncurry test: should say true")
+    println(uncurry(g1)(6,5) == g1(6)(5))
+    
+    println("\ncompose test: should say true then true")
+    println(compose(timesTwo, plusThree)(10) == 26)
+    println(compose(plusThree, timesTwo)(10) == 23)
   }
 
 }

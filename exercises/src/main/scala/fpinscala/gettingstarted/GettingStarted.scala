@@ -159,9 +159,6 @@ object PolymorphicFunctions {
     go(0)
   }
 
-
-
-  
   // Polymorphic functions are often so constrained by their type
   // that they only have one implementation! Here's an example:
   def partial1[A,B,C](a: A, f: (A,B) => C): B => C =
@@ -172,13 +169,21 @@ object PolymorphicFunctions {
   // Note that `=>` associates to the right, so we could
   // write the return type as `A => B => C`
   def curry[A,B,C](f: (A, B) => C): A => (B => C) =
-    ???
-
-  // NB: The `Function2` trait has a `curried` method already
-
+    f.curried // the cheap answer, obviously
+      // lets also try these
+  /* val curriedPrime = new function2[A,B,C] {
+      def 
+    }
+    /* or */ (a: A) => ((b: B) => partial1(a, f))
+      
+  // NB: The `Function2` trait has a `curried` method already 
+*/
   // Exercise 4: Implement `uncurry`
   def uncurry[A,B,C](f: A => B => C): (A, B) => C =
-    ???
+    val f2 = new Function1[A,B=>C] {
+      f2 = f.uncurried
+    } 
+    //f2.uncurried
 
   /*
   NB: There is a method on the `Function` object in the standard library,
@@ -192,24 +197,28 @@ object PolymorphicFunctions {
 
   // Exercise 5: Implement `compose`
 
-  def compose[A,B,C](f: B => C, g: A => B): A => C = {
-    g(f)
-  }
+  def compose[A,B,C](f: B => C, g: A => B): A => C = 
+    ??? //g(f)
+  
   
 
-  // testing
+  // testing for the polymorphic functions thing
   def main(args: Array[String]): Unit = {
     def lessThan(n: Int, p: Int): Boolean = { // strictly for the test
       if (n < p) true
       else false
+    }
+    // incidentally, the book has this
+    val lessThan2 = new Function2[Int, Int, Boolean] {
+      def apply(a: Int, b: Int) = a < b
     }
 
     def timesTwo(n: Int): Int = n*2
     def plusThree(n: Int): Int = n+3
 
     println("isSorted test: should be true then false")
-    println(isSorted(Array(1,2,3,4), lessThan))
-    println(isSorted(Array(4,3,2,5,1), lessThan))
+    println(isSorted(Array(1,2,3,4), lessThan2))
+    println(isSorted(Array(4,3,2,5,1), lessThan2)) // lt1 and lt2 are equivalent. 
     println("compose test")
     println(compose(timesTwo, plusThree))
     println(compose(plusThree, timesTwo))

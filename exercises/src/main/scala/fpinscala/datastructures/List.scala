@@ -26,7 +26,7 @@ object List { // `List` companion object. Contains functions for creating and wo
   val x = List(1,2,3,4,5) match {
     case Cons(x, Cons(2, Cons(4, _))) => x
     case Nil => 42
-    case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
+    case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y // this is the winner
     case Cons(h, t) => h + sum(t)
     case _ => 101
   }
@@ -49,10 +49,15 @@ object List { // `List` companion object. Contains functions for creating and wo
   def product2(ns: List[Double]) =
     foldRight(ns, 1.0)(_ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
 
+  def tail[A](l: List[A]): List[A] = l match {
+    case Cons(_, Nil) => Nil
+    case Cons(_, xs) => xs
+  }
 
-  def tail[A](l: List[A]): List[A] = ???
-
-  def setHead[A](l: List[A], h: A): List[A] = ???
+  def setHead[A](l: List[A], h: A): List[A] = l match {
+    case Cons(_, Nil) => Cons(h, Nil)
+    case Cons(_, xs)  => Cons(h, xs)
+  } //
 
   def drop[A](l: List[A], n: Int): List[A] = ???
 
@@ -65,4 +70,16 @@ object List { // `List` companion object. Contains functions for creating and wo
   def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = ???
 
   def map[A,B](l: List[A])(f: A => B): List[B] = ???
+
+  def main(args: Array[String]): Unit = {
+    val p1 = List(1,2,3,4,5)
+    val pBl1 = List(2,3,4,5)==tail(p1)
+    val p2 = Cons('a', Nil)
+    val pBl2 = tail(p2)==Nil
+    println("unit test 1 for tail, should return true: " + pBl1)
+    println("unit test 2 for tail, should return true: " + pBl2)
+    val q1 = List('a','b','c')
+    val qBl1 = Cons('z', tail(q1))==setHead(q1,'z')
+    println("unit test 1 for setHead, should return true: " + qBl1)
+  }
 }

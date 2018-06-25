@@ -55,17 +55,32 @@ object List { // `List` companion object. Contains functions for creating and wo
   }
 
   def setHead[A](l: List[A], h: A): List[A] = l match {
+    case Nil          => Cons(h,Nil)
     case Cons(_, Nil) => Cons(h, Nil)
     case Cons(_, xs)  => Cons(h, xs)
   } //
 
-  def drop[A](l: List[A], n: Int): List[A] = ???
+  def drop[A](l: List[A], n: Int): List[A] = {
+    if (n<1) l
+    else if (n>length(l)) Nil
+    else drop(tail(l), n-1) 
+  }
 
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = ???
-
+  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
+    case Nil => Nil
+    case Cons(x,xs) => if (f(x)) dropWhile(xs,f)
+                       else Cons(x,xs)
+  }
+ 
   def init[A](l: List[A]): List[A] = ???
 
-  def length[A](l: List[A]): Int = ???
+  def length[A](l: List[A]): Int = {
+    def gloop(l: List[A], counter: Int): Int = l match {
+      case Nil => counter
+      case Cons(_,xs) => gloop(tail(l), counter+1)
+    }
+    gloop(l, 0)
+  }
 
   def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = ???
 
@@ -81,5 +96,13 @@ object List { // `List` companion object. Contains functions for creating and wo
     val q1 = List('a','b','c')
     val qBl1 = Cons('z', tail(q1))==setHead(q1,'z')
     println("unit test 1 for setHead, should return true: " + qBl1)
+    val r1 = List('a','b','c','d')
+    val r2 = List(2,4,6,8,9,10,12)
+    val rBl1 = List('c','d')==drop(r1, 2)
+    val isEven = (x: Int) => x % 2==0
+    val rBl2 = List(9, 10,12)==dropWhile(r2, isEven)
+    
+    println("unit test1 for drop, should return true: " + rBl1)
+    println("unit test1 for dropWhile, should return true: " + rBl2)
   }
 }

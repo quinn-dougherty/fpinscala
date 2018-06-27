@@ -56,6 +56,11 @@ object List { // `List` companion object. Contains functions for creating and wo
     case Cons(_, xs) => xs
   }
 
+  def head[A](l: List[A]): A = l match {
+    //case Nil => error
+    case Cons(x, _) => x
+  }
+
   def setHead[A](l: List[A], h: A): List[A] = l match {
     case Nil          => Cons(h,Nil)
     case Cons(_, Nil) => Cons(h, Nil)
@@ -104,10 +109,79 @@ object List { // `List` companion object. Contains functions for creating and wo
     foldLeft(l,0)((x:Int, _:A) => x+1)
   }
 
+// exercises 3.12
+  def reverse(l: List[Int]): List[Int] = l match {
+    case Nil => Nil
+    case Cons(x,xs) => append(reverse(xs), Cons(x,Nil))
+  }
+
+
+// exercise 3.13(HARD) -- implement foldLeft in terms of foldRight, vice versa. -- hint, this is what helps w tailrecursion.
+
+// exercise 3.14 -- immplement append in terms of either foldLeft or foldRight. 
+
+// 3.15 -- concat: [[A]]->[A]
+  def concat[A](l: List[List[A]]): List[A] = l match {
+    case Nil => Nil
+    case Cons(xs,xss) => append(xs,concat(xss))
+  }
+
+  //3.16
+  def incrOne(l: List[Int]): List[Int] = l match {
+    case Nil => Nil
+    case Cons(x,xs) => Cons(x+1,incrOne(xs))
+  }
+
+// 3.17
+  def doubToString(l: List[Double]): List[String] = l match {
+    case Nil => Nil
+    case Cons(x,xs) => Cons(x.toString,doubToString(xs))
+  }
+
+  // 3.18
   def map[A,B](l: List[A])(f: A => B): List[B] = l match {
     case Nil => Nil
     case Cons(x,xs) => Cons(f(x),map(xs)(f))
   }
+
+  // 3.19
+  def filter[A](as: List[A])(p: A => Boolean): List[A] = as match {
+    case Nil => Nil
+    case Cons(x,xs) => if (p(x)) Cons(x,filter(xs)(p)) else filter(xs)(p)
+  }
+
+  //3.20  //
+  def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] = as match {
+    case Nil => Nil
+    case Cons(x,xs) => append(f(x),(flatMap(xs)(f))) // apparently this works. and you oughtn't say 
+  }
+/* 
+  //3.21 do filter w flatmap
+  def filter[A](as: List[A])(p: A => Boolean): List[A] = as match {
+    case Nil => Nil
+    case Cons(x,xs) => // stil don't have it
+  } */ 
+
+  // 3.22 do "zip with plus" on (ls: List[Int])(ms: List[Int])
+  def zwp(as: List[Int], bs: List[Int]): List[Int] = as match {
+    case Nil => Nil
+    case Cons(x,xs) => Cons(x+(head(bs)),zwp(xs,tail(bs)))
+    // fails when length as is greater than length bs. 
+  }
+//    = Cons(head(as)+head(bs),zwp(tail(as),tail(bs))) 
+
+
+      // 3.23 generalize it properly into zipwith.
+  def zipWith[A,B,C](as: List[A])(bs: List[B])(op: (A,B) => C): List[C] =
+    (as,bs) match {
+      case (Nil,Nil) => Nil
+      case (_  ,Nil) => Nil
+      case (Nil,_  ) => Nil
+      case (Cons(x,xs),Cons(y,ys)) => Cons(op(x,y),zipWith(xs)(ys)(op))
+    }
+
+//3.24 Hard -- hasSubsequence, check whether list has a sublist
+// hasSubsequence(List(1,2,3,4))(List(1,2)) ==> true
 
   def main(args: Array[String]): Unit = {
     val p1 = List(1,2,3,4,5)
@@ -145,11 +219,28 @@ object List { // `List` companion object. Contains functions for creating and wo
     println("should be id- should return List(1,2,3)") // that is correct
     val vBl1 = 4==length2(r1)
     println("test for length2, which uses foldRight; should return true: " + vBl1)
-x
+
     val wBl01 = sum3(List(1,2,3))==product3(List(1,2,3))
     val wBl11 = sum3(List(1,2,3))==length3(List(1,2,3,4,5,6))
     val wBl1 = wBl01==wBl11
     println("testing the foldLeft functions, should say true: " + wBl1)
+    val xBl1 = reverse(p1)==List(5,4,3,2,1)
+    println("testing reverse, should say true: " + xBl1)
+
+    val yBl1 = flatMap(List(1,2,3))(i => List(i,i))==List(1,1,2,2,3,3)
+    println("testing flatmap, should say true: " + yBl1)
+    val zBl1 = p1==concat(List(List(1),List(2),List(3),List(4),List(5)))
+    println("testing concat, should say true: " + zBl1)
+
+    val aBl1 = filter(p1)(isEven)==List(2,4)
+    println("testing filter, should say true: " + aBl1)
+/*
+    //println(zwp(r2,p1)) broken because length r2 > length p1
+    println(zwp(p1,r2))
+    println(zipWith(r2)(p1)(_+_))
+    println(zipWith(p1)(r2)(_+_)) */ 
+    val bBl1 = zipWith(r2)(p1)(_+_)==zwp(p1,r2)
+    println("testing zipWith, should say true: " + bBl1)
   }
 }
 

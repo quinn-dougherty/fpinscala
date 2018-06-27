@@ -1,0 +1,12 @@
+serious list exercises to return to after trees : 
+
+3.24 -- has sublist
+     def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean
+
+3.13 -- implement foldLeft in terms of foldRight, vice versa. this is what helps w tail recursion. 
+-- note -- i didn't write a tailrecursive foldLeft (3.10)  
+
+3.14 -- append in terms of either foldLeft or foldRight. 
+
+i'd also like to know what a safe head looks like, but that has something to do w typeclass annotation. 
+I also think w something w typeclasses could get me a more elegant-looking zipWith.  

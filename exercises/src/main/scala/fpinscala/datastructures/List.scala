@@ -48,6 +48,8 @@ object List { // `List` companion object. Contains functions for creating and wo
 
   def product2(ns: List[Double]) =
     foldRight(ns, 1.0)(_ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
+// this version of product2, because foldright, can't skip to the end and make a "0" on the encounter of its first zero. 
+
 
   def tail[A](l: List[A]): List[A] = l match {
     case Cons(_, Nil) => Nil
@@ -71,8 +73,11 @@ object List { // `List` companion object. Contains functions for creating and wo
     case Cons(x,xs) => if (f(x)) dropWhile(xs,f)
                        else Cons(x,xs)
   }
- 
-  def init[A](l: List[A]): List[A] = ???
+
+  def init[A](l: List[A]): List[A] = l match {
+    case Cons(_,Nil) => Nil
+    case Cons(x,xs)  => Cons(x,init(xs))
+  }
 
   def length[A](l: List[A]): Int = {
     def gloop(l: List[A], counter: Int): Int = l match {
@@ -82,9 +87,27 @@ object List { // `List` companion object. Contains functions for creating and wo
     gloop(l, 0)
   }
 
-  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = ???
+  def length2[A](l: List[A]): Int = {
+    foldRight(l,0)((_:A, x:Int) => x+1)
+  }
 
-  def map[A,B](l: List[A])(f: A => B): List[B] = ???
+// this must be made tail-recursive (exercise 3.10)
+  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = l match {
+    case Nil => z
+    case Cons(x,Nil) => f(z,x)
+    case Cons(x,xs) => f(foldLeft(xs,z)(f),x)
+  }
+
+  def sum3(l: List[Int]): Int = foldLeft(l,0)(_+_)
+  def product3(l: List[Int]): Int = foldLeft(l,1)(_*_)
+  def length3[A](l: List[A]): Int = { 
+    foldLeft(l,0)((x:Int, _:A) => x+1)
+  }
+
+  def map[A,B](l: List[A])(f: A => B): List[B] = l match {
+    case Nil => Nil
+    case Cons(x,xs) => Cons(f(x),map(xs)(f))
+  }
 
   def main(args: Array[String]): Unit = {
     val p1 = List(1,2,3,4,5)
@@ -101,8 +124,34 @@ object List { // `List` companion object. Contains functions for creating and wo
     val rBl1 = List('c','d')==drop(r1, 2)
     val isEven = (x: Int) => x % 2==0
     val rBl2 = List(9, 10,12)==dropWhile(r2, isEven)
-    
+    val tBl1 = init(r1)==List('a','b','c')
     println("unit test1 for drop, should return true: " + rBl1)
     println("unit test1 for dropWhile, should return true: " + rBl2)
+    println("unit test1 for init, should return true: " + tBl1)
+    val uBl1 = List(3,5,7,9,10,11,13) == (map(r2)((x: Int)=>x+1))
+    println("test1 for map, should return true: " + uBl1)
+
+    println("TESTING FOR FOLDLEFT")
+    val plus = (x:Int, y:Int) => x+y
+    println(r2)
+    println("folding r2 w + (left)")
+    println(foldLeft(r2,0)(plus))
+    println("folding r2 w + (right)") // hm am i getting the left vs. right correct? 
+    println(foldRight(r2,0)(plus))
+
+    // EXERCISE 3.8
+    println("exercise 3.8: ") 
+    println(foldRight(List(1,2,3),Nil:List[Int])(Cons(_,_)))
+    println("should be id- should return List(1,2,3)") // that is correct
+    val vBl1 = 4==length2(r1)
+    println("test for length2, which uses foldRight; should return true: " + vBl1)
+x
+    val wBl01 = sum3(List(1,2,3))==product3(List(1,2,3))
+    val wBl11 = sum3(List(1,2,3))==length3(List(1,2,3,4,5,6))
+    val wBl1 = wBl01==wBl11
+    println("testing the foldLeft functions, should say true: " + wBl1)
   }
 }
+
+
+/// SYNTAX NOTE: "(+)" in haskell is "_ + _" in Scala
